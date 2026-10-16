@@ -1,0 +1,23 @@
+# Bitácora (documento individual, no versionar)
+Bitacora_Diaria.md
+
+# Carpetas nativas generadas por el SDK de Flutter
+android/
+web/
+windows/
+
+# Otras plataformas (si se generan más adelante)
+ios/Pods/
+macos/Pods/
+ios/Flutter/ephemeral/
+macos/Flutter/ephemeral/
+linux/flutter/ephemeral/
+
+# Entorno / SO
+.DS_Store
+Thumbs.db
+*.log
+
+# Secretos / variables de entorno
+.env
+*.env
