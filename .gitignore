@@ -2,6 +2,9 @@
 Bitacora_Diaria.md
 Bitacora_Diaria.docx
 
+# Reportes locales (no versionar)
+reportes/
+
 # Carpetas nativas generadas por el SDK de Flutter
 android/
 web/
