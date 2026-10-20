@@ -42,6 +42,26 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return const Color(0xFFAC4052);
   }
 
+  Color colorPrioridad(String prioridad) {
+    if (prioridad == 'Alta') return const Color(0xFFC62828);
+    if (prioridad == 'Media') return const Color(0xFFEF6C00);
+    return const Color(0xFF2E7D32);
+  }
+
+  Widget chipPrioridad(String prioridad) {
+    final color = colorPrioridad(prioridad);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color),
+      ),
+      child: Text('Prioridad $prioridad',
+          style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+    );
+  }
+
   Widget resumen(String etiqueta, String valor, IconData icono) {
     return Expanded(
       child: Card(
@@ -187,9 +207,17 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                                             children: [
                                               Text('${item.id}  ·  ${item.cliente}'),
                                               const SizedBox(height: 6),
-                                              Text(item.estado, style: TextStyle(
-                                                color: colorEstado(item.estado), fontWeight: FontWeight.bold,
-                                              )),
+                                              Wrap(
+                                                spacing: 10,
+                                                runSpacing: 4,
+                                                crossAxisAlignment: WrapCrossAlignment.center,
+                                                children: [
+                                                  Text(item.estado, style: TextStyle(
+                                                    color: colorEstado(item.estado), fontWeight: FontWeight.bold,
+                                                  )),
+                                                  chipPrioridad(item.prioridad),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
