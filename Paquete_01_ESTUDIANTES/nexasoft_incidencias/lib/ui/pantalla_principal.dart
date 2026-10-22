@@ -13,14 +13,32 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   final GestorIncidencias g = GestorIncidencias();
+  final TextEditingController busquedaCtrl = TextEditingController();
   bool cargando = true;
   String? error;
   String busqueda = '';
+  String estadoFiltro = 'Todos';
+  String prioridadFiltro = 'Todas';
 
   @override
   void initState() {
     super.initState();
     cargar();
+  }
+
+  @override
+  void dispose() {
+    busquedaCtrl.dispose();
+    super.dispose();
+  }
+
+  void limpiarFiltros() {
+    busquedaCtrl.clear();
+    setState(() {
+      busqueda = '';
+      estadoFiltro = 'Todos';
+      prioridadFiltro = 'Todas';
+    });
   }
 
   Future<void> cargar() async {
@@ -104,7 +122,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   @override
   Widget build(BuildContext context) {
-    final items = g.buscar(busqueda);
+    final items = g.buscar(busqueda,
+        estado: estadoFiltro, prioridad: prioridadFiltro);
     return Scaffold(
       appBar: AppBar(
         title: const Text('NexaSoft | Incidencias'),
@@ -171,6 +190,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 5),
                           child: TextField(
+                            controller: busquedaCtrl,
                             decoration: const InputDecoration(
                               labelText: 'Buscar incidencias',
                               hintText: 'Ejemplo: WiFi, correo, pantalla',
@@ -178,6 +198,53 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                               border: OutlineInputBorder(),
                             ),
                             onChanged: (texto) => setState(() => busqueda = texto),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 4),
+                          child: Wrap(
+                            spacing: 10,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 190,
+                                child: DropdownButtonFormField<String>(
+                                  value: estadoFiltro,
+                                  isExpanded: true,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Estado',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  ),
+                                  items: ['Todos', 'Pendiente', 'En proceso', 'Resuelta']
+                                      .map((v) => DropdownMenuItem(value: v, child: Text(v)))
+                                      .toList(),
+                                  onChanged: (v) => setState(() => estadoFiltro = v ?? 'Todos'),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 190,
+                                child: DropdownButtonFormField<String>(
+                                  value: prioridadFiltro,
+                                  isExpanded: true,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Prioridad',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  ),
+                                  items: ['Todas', ...Incidencia.prioridades]
+                                      .map((v) => DropdownMenuItem(value: v, child: Text(v)))
+                                      .toList(),
+                                  onChanged: (v) => setState(() => prioridadFiltro = v ?? 'Todas'),
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: limpiarFiltros,
+                                icon: const Icon(Icons.filter_alt_off),
+                                label: const Text('Limpiar'),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
@@ -189,7 +256,22 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                         ),
                         Expanded(
                           child: items.isEmpty
-                              ? const Center(child: Text('No se encontraron incidencias'))
+                              ? Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.search_off, size: 42, color: Colors.black38),
+                                      const SizedBox(height: 8),
+                                      const Text('No hay incidencias con los filtros seleccionados'),
+                                      const SizedBox(height: 8),
+                                      TextButton.icon(
+                                        onPressed: limpiarFiltros,
+                                        icon: const Icon(Icons.filter_alt_off),
+                                        label: const Text('Limpiar filtros'),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               : ListView.builder(
                                   padding: const EdgeInsets.only(left: 12, right: 12, bottom: 100),
                                   itemCount: items.length,
